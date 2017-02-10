@@ -1,0 +1,35 @@
+import subprocess
+from PIL import Image
+from pytesser import *
+import sys
+import RPi.GPIO as GPIO
+from speech import Speech
+from time import sleep
+touch_power=2
+touch_gnd=6
+touch_signal=18
+key=1
+speech = Speech()
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(touch_signal,GPIO.IN)
+
+# loop forever
+while True:
+  if GPIO.input(touch_signal)== GPIO.HIGH:
+    print(key)
+    if key==1:
+      subprocess.Popen(['sudo','fswebcam','-r','1024X768','-S','20','gg.jpg'],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+      sleep(2)
+      im=Image.open('gg.jpg')
+      im.save('gg.tif')
+      sleep(2)
+      im-Image.open('gg.tif')
+      text=image_to_string(im)
+      text=image_file_to_string('gg.jpg')
+      text=image_file_to_string('gg.jpg',graceful_errors=True)
+      print(text)
+      key=0
+      speech.text_to_speech(text)
+      #words.close()
+    if GPIO.input(touch_signal) == GPIO.LOW:
+        key=1
